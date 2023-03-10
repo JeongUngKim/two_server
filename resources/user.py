@@ -144,7 +144,7 @@ class UserLoginResource(Resource) :
         access_token = create_access_token( result_list[0]['id'] )
 
         return {"result" : "success", "access_token" : access_token}, 200
-    
+
 jwt_blacklist = set()
 
 class UserLogoutResource(Resource) :
@@ -453,6 +453,38 @@ class UserProfileChange(Resource) :
         
 
         return {'result':'success','state':'logout'},200
+
+    @jwt_required()
+    def get(self) :
+        userId = get_jwt_identity()
+        try :
+            connection = get_connection()
+
+            query = '''select * from user
+                        where id = %s ;'''
+            record = (userId,)
+
+            cursor = connection.cursor(dictionary=True)
+
+            cursor.execute(query,record)
+
+            user = cursor.fetchall()
+
+            i = 0 
+            for row in user :
+                user[i]['createdAt'] = row['createdAt'].isoformat()
+                i = i + 1
+            cursor.close()
+
+            connection.close()
+           
+        except Exception as e :
+            print(str(e))
+            cursor.close()
+            connection.close()
+            return {'error':str(e)},500
+        
+        return {'result':'success','user':user},200
 
     @jwt_required()
     def delete(self) :
