@@ -47,6 +47,7 @@ api.add_resource(ContentWatch,'/contentWatch/<int:contentId>')
 api.add_resource(contentWatchme,'/contentWatch')
 
 # 유저 로그인관련 api
+
 api.add_resource(UserRegisterResource,"/register")
 api.add_resource(UserLoginResource,"/login")
 api.add_resource(UserLogoutResource,"/logout")
