@@ -640,6 +640,43 @@ class contentWatchme(Resource):
                 "pageNum":page,
                 "contentWatchSize":len(contentWatch_list)},200
 
+class contentRank(Resource) :
+    def get(self) : 
+        try : 
+            connection = get_connection()
+            
+            query = '''select c.*,count(cm.contentId) as cnt
+                    from contentWatchme cm right join content c
+                    on cm.contentId = c.id 
+                    group by c.id
+                    order by cnt desc
+                    limit 0, 20;'''
+            
+            cursor = connection.cursor(dictionary=True)
 
+            cursor.execute(query)
+
+            rank_list = cursor.fetchall()
+
+            i = 0 
+            for row in rank_list :
+                rank_list[i]['createdYear'] = row['createdYear'].isoformat()
+                i = i+ 1
+
+            cursor.close()
+
+            connection.close()
+
+        except Error as e :
+            print(str(e))
+
+            cursor.close()
+
+            connection.close()
+
+            return {'error':str(e)},500
+        
+
+        return {'result':'success','rank':rank_list},200
 
 

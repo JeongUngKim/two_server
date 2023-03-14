@@ -3,7 +3,7 @@ from flask_restful import Api
 from config import Config
 from flask_jwt_extended import JWTManager
 
-from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, content, contentLike, contentReview, contentReviewLike, contentReviewUD, contentWatchme, search
+from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewUD, contentWatchme, search
 from resources.party import party, partyBoard, partyBoardUD, partyD, partySearch, partycheck
 from resources.user import UserContentLike, UserGenre, UserIsEmail, UserIsId, UserIsNickname, UserIspassword, UserLoginResource, UserLogoutResource, UserPasswordChanged, UserProfileChange, UserRegisterResource
 from resources.user import jwt_blacklist
@@ -20,6 +20,9 @@ def check_if_token_is_revoked(jwt_header, jwt_payload) :
     return jti in jwt_blacklist
 
 api = Api(app)
+
+# 통합 랭킹 api
+api.add_resource(contentRank,'/rank')
 
 # 검색 api
 api.add_resource(search,'/search')
