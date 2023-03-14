@@ -89,7 +89,9 @@ class partyBoard(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select partyBoardId,service,title,createdAt,userId from partyBoard 
+            query = '''select pb.*,u.userEmail 
+            from partyBoard pb join user u 
+            on pb.userId = u.id 
             limit '''+str(page)+''',10 ; '''
 
             cursor = connection.cursor(dictionary=True)
@@ -100,6 +102,7 @@ class partyBoard(Resource) :
             i = 0
             for row in partyBoard_list :
                 partyBoard_list[i]['createdAt'] = row['createdAt'].isoformat()
+                partyBoard_list[i]['finishedAt'] = row['finishedAt'].isoformat()
                 i = i+ 1
 
             cursor.close()
