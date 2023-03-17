@@ -208,7 +208,7 @@ class UserIsId(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select id,name,userEmail 
+            query = '''select userEmail 
                     from user
                     where name = %s and questionNum= %s and questionAnswer = %s ;'''
             record = (data['name'] , data['questionNum'] , data['questionAnswer'])
@@ -228,7 +228,7 @@ class UserIsId(Resource) :
             connection.close()
             return{"error",str(e)},500
         
-        return {"user":user_list},200
+        return user_list[0],200
 
 class UserIsEmail(Resource) :
     def post(self) :
