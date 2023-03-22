@@ -115,7 +115,7 @@ class partyBoard(Resource) :
         
         return {'result':'success','partyBoard' : partyBoard_list
                 ,'pageNum':page,
-                'partyBoardSize':len(partyBoard_list)},200
+                'partyBoardSize':str(len(partyBoard_list))},200
 
 class partyBoardUD(Resource) :
     @jwt_required()
@@ -281,7 +281,7 @@ class party(Resource) :
         
         return {'result': 'success','partyList' : party_list,
                 'pageNum':page,
-                'partySize':len(party_list)},200
+                'partySize':str(len(party_list))},200
         
 class partyD(Resource) :
     @jwt_required()

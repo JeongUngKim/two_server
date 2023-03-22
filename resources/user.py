@@ -352,7 +352,7 @@ class UserContentLike(Resource):
 
         return {"contentLike_list" : contentLike_list ,
                 "pageNum":page,
-                'contentSize':len(contentLike_list)},200
+                'contentSize':str(len(contentLike_list))},200
 
 class UserGenre(Resource) :
     @jwt_required()
