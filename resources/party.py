@@ -316,8 +316,11 @@ class partycheck(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select captain,member,partyBoardId from party
-                        where partyBoardId = %s 
+            query = '''select pb.userId,pb.service,pb.serviceId,pb.servicePassword,pb.finishedAt,u.userEmail
+                        from party p join partyBoard pb
+                        on p.partyBoardId = pb.partyBoardId join user u
+                        on p.member = u.id
+                        where p.partyBoardId = %s 
                         ;
                         '''
             record = (partyBoardId,)
@@ -328,8 +331,11 @@ class partycheck(Resource) :
 
             partyMemberList = cursor.fetchall()
             memberlist = []
+            i=0
             for member in partyMemberList :
-                memberlist.append(member['member'])
+                partyMemberList[i]['finishedAt'] = member['finishedAt'].isoformat()
+                memberlist.append(partyMemberList[i]['userEmail'])
+                i+=1
 
             cursor.close()
 
@@ -344,4 +350,6 @@ class partycheck(Resource) :
             return {'error',str(e)},500
         
         return {'result': 'success','memberCnt':len(partyMemberList),
-                "catain":partyMemberList[0]['partyBoardId'],"member":memberlist},200
+                "memberEmail":memberlist,"service":partyMemberList[0]['service'],
+                 "serviceId":partyMemberList[0]['serviceId'],"servicePassword":partyMemberList[0]['servicePassword'] ,
+                 "finishedAt":partyMemberList[0]['finishedAt']},200
