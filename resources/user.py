@@ -208,7 +208,7 @@ class UserIsId(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select id,name,userEmail 
+            query = '''select userEmail 
                     from user
                     where name = %s and questionNum= %s and questionAnswer = %s ;'''
             record = (data['name'] , data['questionNum'] , data['questionAnswer'])
@@ -228,7 +228,7 @@ class UserIsId(Resource) :
             connection.close()
             return{"error",str(e)},500
         
-        return {"user":user_list},200
+        return user_list[0],200
 
 class UserIsEmail(Resource) :
     def post(self) :
@@ -250,9 +250,9 @@ class UserIsEmail(Resource) :
             return{"error",str(e)},500
         
         if email_list == [] :
-            return {"result ": "아이디로 사용이 가능 합니다.","result_code":1 },200
+            return {"result": "아이디로 사용이 가능 합니다.","result_code":"1" },200
         else :
-            return {"result ": "아이디로 사용이 불가능 합니다.","result_code":0 },200
+            return {"result": "아이디로 사용이 불가능 합니다.","result_code":"0" },200
 
 class UserIsNickname(Resource) :
     def post(self) :
@@ -274,18 +274,18 @@ class UserIsNickname(Resource) :
             return{"error",str(e)},500
         
         if nickname_list == [] :
-            return {"result ": "닉네임으로 사용이 가능 합니다.","result_code":1 },200
+            return {"result": "닉네임으로 사용이 가능 합니다.","result_code":"1" },200
         else :
-            return {"result ": "닉네임으로 사용이 불가능 합니다.","result_code":0 },200
+            return {"result": "닉네임으로 사용이 불가능 합니다.","result_code":"0" },200
 
 class UserPasswordChanged(Resource):
     def put(self) :
         # { userEmail : abc@naver.com 
-        #   newpassword : 1234 }
+        #   password : 1234 }
 
         data = request.get_json()
 
-        password = hash_password(data["newpassword"])
+        password = hash_password(data["password"])
         try :
             connection = get_connection()
 
@@ -312,7 +312,7 @@ class UserContentLike(Resource):
     def get(self) :
         userId = get_jwt_identity()
         page = request.args.get('page')
-        page = int(page) * 10
+        pageCount = int(page) * 10
         print(page)
         try :
             connection = get_connection()
@@ -321,7 +321,7 @@ class UserContentLike(Resource):
                         from contentLike cl join content c 
                         on cl.contentId = c.Id 
                         where cl.contentLikeUserId = %s 
-                        limit ''' + str(page) +''', 10 ; ''' 
+                        limit ''' + str(pageCount) +''', 10 ; ''' 
             
             record = (userId,)
 

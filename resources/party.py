@@ -85,12 +85,14 @@ class partyBoard(Resource) :
 
     def get(self) : 
         page = request.args.get('page')
-        page = int(page) * 10
+        pageCount = int(page) * 10
         try :
             connection = get_connection()
 
-            query = '''select partyBoardId,service,title,createdAt,userId from partyBoard 
-            limit '''+str(page)+''',10 ; '''
+            query = '''select pb.*,u.userEmail 
+            from partyBoard pb join user u 
+            on pb.userId = u.id 
+            limit '''+str(pageCount)+''',10 ; '''
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query)
@@ -100,6 +102,7 @@ class partyBoard(Resource) :
             i = 0
             for row in partyBoard_list :
                 partyBoard_list[i]['createdAt'] = row['createdAt'].isoformat()
+                partyBoard_list[i]['finishedAt'] = row['finishedAt'].isoformat()
                 i = i+ 1
 
             cursor.close()
@@ -241,7 +244,7 @@ class party(Resource) :
 
         userId = get_jwt_identity()
         page = request.args.get('page')
-        page = int(page) * 10
+        pageCount = int(page) * 10
         try :
             connection = get_connection()
 
@@ -250,7 +253,7 @@ class party(Resource) :
                         join partyBoard pb 
                         on p.partyBoardId = pb.partyBoardId
                         where member = %s 
-                        limit '''+str(page) + ''',10 ;'''
+                        limit '''+str(pageCount) + ''',10 ;'''
             record = (userId,)
 
             cursor = connection.cursor(dictionary=True)
@@ -264,6 +267,7 @@ class party(Resource) :
                 party_list[i]['createdAt'] = row['createdAt'].isoformat()
                 party_list[i]['finishedAt'] = row['finishedAt'].isoformat()
                 i = i + 1 
+            
             cursor.close()
 
             connection.close()
