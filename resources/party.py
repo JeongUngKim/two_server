@@ -316,9 +316,8 @@ class partycheck(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select count(member) as memberCnt from party
+            query = '''select captain,member,partyBoardId from party
                         where partyBoardId = %s 
-                        group by partyBoardId;
                         ;
                         '''
             record = (partyBoardId,)
@@ -327,11 +326,15 @@ class partycheck(Resource) :
 
             cursor.execute(query,record) 
 
-            party_member_cnt = cursor.fetchall()
+            partyMemberList = cursor.fetchall()
+            memberlist = []
+            for member in partyMemberList :
+                memberlist.append(member['member'])
 
             cursor.close()
 
             connection.close()
+
 
         except Error as e :
             print(str(e))
@@ -340,4 +343,5 @@ class partycheck(Resource) :
             connection.close()
             return {'error',str(e)},500
         
-        return {'result': 'success','memberCnt':party_member_cnt[0]},200
+        return {'result': 'success','memberCnt':len(partyMemberList),
+                "catain":partyMemberList[0]['partyBoardId'],"member":memberlist},200
