@@ -266,7 +266,7 @@ class contentReview(Resource) :
         
         return {'result':'success','contentReviewList':contentReview_list,
                 'pageNum':page,
-                'contentReviewSize':len(contentReview_list)},200
+                'contentReviewSize':str(len(contentReview_list))},200
 
     @jwt_required()
     def post(self,contentId) :
@@ -464,7 +464,7 @@ class ReviewComment(Resource):
         
         return {'result':'success','commentList':comment_list,
                 'pageNum':page,
-                'commentSize':len(comment_list)},200
+                'commentSize':str(len(comment_list))},200
     
     @jwt_required()
     def post(self,contentReviewId) :
@@ -638,7 +638,7 @@ class contentWatchme(Resource):
 
         return {'result':'success','contentWatch_list':contentWatch_list,
                 "pageNum":page,
-                "contentWatchSize":len(contentWatch_list)},200
+                "contentWatchSize":str(len(contentWatch_list))},200
 
 class contentRank(Resource) :
     def get(self) : 
