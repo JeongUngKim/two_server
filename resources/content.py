@@ -19,7 +19,7 @@ class searchoption() :
             connection = get_connection()
             query='''select * 
                 from content 
-                where (title like "%'''+ keyword+'''%" or content like "%'''+ keyword+'''%" ) and type = "movie" and
+                where title like "%'''+ keyword+'''%" and type = "movie" and
                 genre like "%'''+genre+'''%" and contentRating >= '''+str(rating)+''' and createdYear >= "'''+str(year)+'''"
                 order by '''+filtering + ''' '''+sort+'''
                 limit '''+ str(offset)+''',''' +str(limit)+''';'''
@@ -53,7 +53,7 @@ class searchoption() :
             connection = get_connection()
             query='''select * 
                     from content 
-                    where (title like "%'''+ keyword+'''%" or content like "%'''+ keyword+'''%" ) and type = "tv" and
+                    where title like "%'''+ keyword+'''%" and type = "tv" and
                     genre like "%'''+genre+'''%" and contentRating >= '''+str(rating)+''' and createdYear >= "'''+str(year)+'''"
                     order by '''+filtering + ''' '''+sort+'''
                     limit '''+ str(offset)+''',''' +str(limit)+''';'''
@@ -235,7 +235,7 @@ class contentLike(Resource) :
 class contentReview(Resource) :
     def get(self,contentId) :
         page = request.args.get('page')
-        page = int(page) * 10
+        pageCount = int(page) * 10
 
         try :
             connection = get_connection()
@@ -244,7 +244,7 @@ class contentReview(Resource) :
                         on cr.contentReviewId = crl.contentReviewId 
                         where cr.contentId = %s
                         group by contentReviewId
-                        limit '''+str(page)+''',10 ;'''
+                        limit '''+str(pageCount)+''',10 ;'''
             record = (contentId,)
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query,record)
@@ -436,13 +436,13 @@ class contentReviewLike(Resource) :
 class ReviewComment(Resource):
     def get(self,contentReviewId):
         page = request.args.get('page')
-        page = int(page) * 10
+        pageCount = int(page) * 10
         try:
             connection = get_connection()
             query = '''select *
                     from contentReviewComment
                     where contentReviewId = %s
-                    limit '''+str(page)+''',10 ;'''
+                    limit '''+str(pageCount)+''',10 ;'''
             record = (contentReviewId,)
 
             cursor = connection.cursor(dictionary=True)
@@ -604,7 +604,7 @@ class contentWatchme(Resource):
     def get(self):
         userId = get_jwt_identity()
         page = request.args.get('page')
-        page = int(page) * 10
+        pageCount = int(page) * 10
         try : 
             connection = get_connection()
             query = '''select cw.userId,cw.contentId,c.title,c.imgUrl,c.contentRating,c.tmdbcontentId,c.type
@@ -612,7 +612,7 @@ class contentWatchme(Resource):
                     join content c 
                     on cw.contentId = c.Id
                     where cw.userId = %s
-                    limit '''+str(page) + ''', 10 ;'''
+                    limit '''+str(pageCount) + ''', 10 ;'''
             record = (userId,)
 
             cursor = connection.cursor(dictionary=True)
