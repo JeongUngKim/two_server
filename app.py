@@ -3,7 +3,7 @@ from flask_restful import Api
 from config import Config
 from flask_jwt_extended import JWTManager
 
-from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewUD, contentWatchme, search
+from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewMe, contentReviewUD, contentWatchme, search
 from resources.party import party, partyBoard, partyBoardUD, partyD, partySearch, partycheck
 from resources.user import UserContentLike, UserGenre, UserIsEmail, UserIsId, UserIsNickname, UserIspassword, UserLoginResource, UserLogoutResource, UserPasswordChanged, UserProfileChange, UserRegisterResource
 from resources.user import jwt_blacklist
@@ -37,7 +37,7 @@ api.add_resource(UserContentLike,'/contentlike/me')
 # 컨텐츠 리뷰 관련 api
 api.add_resource(contentReview,'/content/<int:contentId>/review')
 api.add_resource(contentReviewUD,'/content/<int:contentId>/review/<int:contentReviewId>')
-
+api.add_resource(contentReviewMe,'/content/review/me')
 # 컨텐츠 리뷰 좋아요 api
 api.add_resource(contentReviewLike,'/contentReview/<int:contentReviewId>/like')
 

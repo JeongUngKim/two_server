@@ -307,7 +307,47 @@ class contentReview(Resource) :
 
         return {"result":"success","contentReviewId":lastId},200
 
-    
+class contentReviewMe(Resource) :
+    @jwt_required()
+    def get(self):
+        page = request.args.get('page')
+        pageCount = int(page) * 10
+        userId = get_jwt_identity()
+        try :
+            connection = get_connection()
+            query = '''select contentReviewId,contentId,title,content,userRating,createdAt,updatedAt
+                        from contentReview
+                        where contentReviewUserId = %s
+                        limit '''+str(pageCount)+''',10 ;'''
+            
+            record = (userId,)
+
+            cursor = connection.cursor(dictionary=True)
+
+            cursor.execute(query,record)
+
+            ReviewList = cursor.fetchall()
+
+            i = 0
+
+            for row in ReviewList :
+                ReviewList[i]['createdAt'] = row['createdAt'].isoformat()
+                ReviewList[i]['updatedAt'] = row['updatedAt'].isoformat()
+                i += 1
+                                
+            cursor.close()
+
+            connection.close()
+        except Error as e :
+            print(str(e))
+            cursor.close()
+            connection.close()
+            return {'error',str(e)},500
+
+        return {"result":"success",
+                "ReviewList":ReviewList,
+                "ReviewListSize":len(ReviewList)},200   
+
 
 class contentReviewUD(Resource) :
     @jwt_required()
