@@ -316,9 +316,11 @@ class partycheck(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select count(member) as memberCnt from party
-                        where partyBoardId = %s 
-                        group by partyBoardId;
+            query = '''select pb.userId,pb.service,pb.serviceId,pb.servicePassword,pb.finishedAt,u.userEmail
+                        from party p join partyBoard pb
+                        on p.partyBoardId = pb.partyBoardId join user u
+                        on p.member = u.id
+                        where p.partyBoardId = %s 
                         ;
                         '''
             record = (partyBoardId,)
@@ -327,11 +329,18 @@ class partycheck(Resource) :
 
             cursor.execute(query,record) 
 
-            party_member_cnt = cursor.fetchall()
+            partyMemberList = cursor.fetchall()
+            memberlist = []
+            i=0
+            for member in partyMemberList :
+                partyMemberList[i]['finishedAt'] = member['finishedAt'].isoformat()
+                memberlist.append(partyMemberList[i]['userEmail'])
+                i+=1
 
             cursor.close()
 
             connection.close()
+
 
         except Error as e :
             print(str(e))
@@ -340,4 +349,7 @@ class partycheck(Resource) :
             connection.close()
             return {'error',str(e)},500
         
-        return {'result': 'success','memberCnt':party_member_cnt[0]},200
+        return {'result': 'success','memberCnt':len(partyMemberList),
+                "memberEmail":memberlist,"service":partyMemberList[0]['service'],
+                 "serviceId":partyMemberList[0]['serviceId'],"servicePassword":partyMemberList[0]['servicePassword'] ,
+                 "finishedAt":partyMemberList[0]['finishedAt']},200
