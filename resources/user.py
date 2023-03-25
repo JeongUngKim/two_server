@@ -529,8 +529,8 @@ class UserProfileChange(Resource) :
             cursor = connection.cursor()
             cursor.execute(query,record)
             connection.commit()
+            
             cursor.close()
-
             connection.close()
 
 
