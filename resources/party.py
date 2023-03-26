@@ -89,7 +89,7 @@ class partyBoard(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select pb.*,u.userEmail 
+            query = '''select pb.*,u.userEmail,u.profileImgUrl
             from partyBoard pb join user u 
             on pb.userId = u.id 
             limit '''+str(pageCount)+''',10 ; '''

@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api
 from config import Config
 from flask_jwt_extended import JWTManager
+from resources.community import community, communityLike, communityUD
 
 from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewMe, contentReviewUD, contentWatchme, search
 from resources.party import party, partyBoard, partyBoardUD, partyD, partySearch, partycheck
@@ -77,5 +78,9 @@ api.add_resource(partySearch,'/search/party')
 # 유저 정보 관련 api
 api.add_resource(UserProfileChange,'/user')
 
+# 커뮤니티 관련 api
+api.add_resource(community,'/community')
+api.add_resource(communityUD,'/community/<int:communityId>')
+api.add_resource(communityLike,'/communityLike/<int:communityId>')
 if __name__ == '__main__' : 
     app.run()
