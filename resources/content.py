@@ -239,9 +239,10 @@ class contentReview(Resource) :
 
         try :
             connection = get_connection()
-            query = '''select cr.*, count(crl.contentReviewLikeUserId) as likeCnt
+            query = '''select cr.*, count(crl.contentReviewLikeUserId) as likeCnt, u.nickname,u.userEmail,u.profileImgUrl
                         from contentReview cr left join contentReviewLike crl
-                        on cr.contentReviewId = crl.contentReviewId 
+                        on cr.contentReviewId = crl.contentReviewId join user u 
+                        on cr.contentReviewUserId = u.id
                         where cr.contentId = %s
                         group by contentReviewId
                         limit '''+str(pageCount)+''',10 ;'''
@@ -295,6 +296,25 @@ class contentReview(Resource) :
 
             connection.close()
 
+            connection = get_connection()
+
+            query = '''select cr.*, count(crl.contentReviewLikeUserId) as likeCnt, u.nickname,u.userEmail,u.profileImgUrl
+                        from contentReview cr left join contentReviewLike crl
+                        on cr.contentReviewId = crl.contentReviewId join user u 
+                        on cr.contentReviewUserId = u.id
+                        where cr.contentId = '''+str(contentId)+''' and cr.contentReviewId = '''+str(lastId)+'''
+                        group by contentReviewId'''
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query)
+            contentReviewList = cursor.fetchall()
+            i = 0
+            for row in contentReviewList :
+                contentReviewList[i]['createdAt'] = row['createdAt'].isoformat()
+                contentReviewList[i]['updatedAt'] = row['updatedAt'].isoformat()
+                i=i+1
+            cursor.close()
+            connection.close()
+
         except Error as e :
 
             print(str(e))
@@ -305,7 +325,7 @@ class contentReview(Resource) :
 
             return {"fail":str(e)},500
 
-        return {"result":"success","contentReviewId":lastId},200
+        return {"result":"success","contentReviewList":contentReviewList},200
 
 class contentReviewMe(Resource) :
     @jwt_required()
@@ -315,8 +335,9 @@ class contentReviewMe(Resource) :
         userId = get_jwt_identity()
         try :
             connection = get_connection()
-            query = '''select contentReviewId,contentId,title,content,userRating,createdAt,updatedAt
-                        from contentReview
+            query = '''select cr.contentReviewId,cr.contentId,cr.title,cr.content,cr.userRating,cr.createdAt,cr.updatedAt , u.nickname,u.userEmail,u.profileImgUrl
+                        from contentReview cr join user u 
+                        on cr.contentReviewUserId = u.id
                         where contentReviewUserId = %s
                         limit '''+str(pageCount)+''',10 ;'''
             
@@ -362,7 +383,7 @@ class contentReviewUD(Resource) :
 
             query = '''update contentReview 
                         set title = %s ,content = %s
-                        where contentreviewId = %s and contentReviewUserId = %s
+                        where contentReviewId = %s and contentReviewUserId = %s
                         ;'''
             
             record = (data['title'],data['content'],contentReviewId,userId)
@@ -373,8 +394,29 @@ class contentReviewUD(Resource) :
 
             connection.commit()
 
+            
+
             cursor.close()
 
+            connection.close()
+
+            connection = get_connection()
+
+            query = '''select cr.*, count(crl.contentReviewLikeUserId) as likeCnt, u.nickname,u.userEmail,u.profileImgUrl
+                        from contentReview cr left join contentReviewLike crl
+                        on cr.contentReviewId = crl.contentReviewId join user u 
+                        on cr.contentReviewUserId = u.id
+                        where cr.contentId = '''+str(contentId)+''' and cr.contentReviewId = '''+str(contentReviewId)+'''
+                        group by contentReviewId'''
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query)
+            contentReviewList = cursor.fetchall()
+            i = 0
+            for row in contentReviewList :
+                contentReviewList[i]['createdAt'] = row['createdAt'].isoformat()
+                contentReviewList[i]['updatedAt'] = row['updatedAt'].isoformat()
+                i=i+1
+            cursor.close()
             connection.close()
 
         except Error as e :
@@ -384,7 +426,7 @@ class contentReviewUD(Resource) :
 
             return {'error':str(e)},500
         
-        return {'result':'success'} , 200
+        return {'result':'success',"contentReviewList":contentReviewList} , 200
 
     @jwt_required()
     def delete(self,contentId,contentReviewId) :

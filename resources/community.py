@@ -48,7 +48,24 @@ class community(Resource) :
             cursor = connection.cursor()
             cursor.execute(query,record)
             connection.commit()
+            lastrowId = cursor.lastrowid
+            cursor.close()
+            connection.close()
 
+            connection = get_connection()
+            query ='''select cm.*,u.nickname,u.userEmail,u.profileImgUrl 
+                    from community cm join user u
+                    on cm.userId = u.id
+                    where cm.communityId = ''' + str(lastrowId) +''';'''
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query)
+
+            communityList = cursor.fetchall()
+            i = 0
+            for row in communityList :
+                communityList[i]['createdAt'] = row['createdAt'].isoformat()
+                communityList[i]['updatedAt'] = row['updatedAt'].isoformat()
+                i+=1
             cursor.close()
             connection.close()
         except Error as e :
@@ -57,7 +74,7 @@ class community(Resource) :
             connection.close()
             return {"error",str(e)},400 
         
-        return {"result":"success"},200
+        return {"result":"success","communityList":communityList},200
     
     @jwt_required(optional=True)
     def get(self) :
@@ -166,15 +183,32 @@ class communityUD(Resource) :
             cursor.execute(query,record)
 
             connection.commit()
+            
+            cursor.close()
+            connection.close()
+            connection = get_connection()
+            query ='''select cm.*,u.nickname,u.userEmail,u.profileImgUrl 
+                    from community cm join user u
+                    on cm.userId = u.id
+                    where cm.communityId = ''' + str(communityId) +''';'''
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query)
 
+            communityList = cursor.fetchall()
+            i = 0
+            for row in communityList :
+                communityList[i]['createdAt'] = row['createdAt'].isoformat()
+                communityList[i]['updatedAt'] = row['updatedAt'].isoformat()
+                i+=1
             cursor.close()
             connection.close()
         except Error as e :
+            print(str(e))
             cursor.close()
             connection.close()
             return {"error",str(e)},400 
         
-        return {"result":"success"},200
+        return {"result":"success","communityList":communityList},200
 
     @jwt_required()
     def delete(self,communityId) :
