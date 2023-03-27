@@ -77,12 +77,14 @@ class community(Resource) :
                     query = '''select cm.*,u.nickname,u.userEmail,u.profileImgUrl 
                     from community cm join user u
                     on cm.userId = u.id
+                    order by cm.createdAt desc 
                     limit ''' + str(pageCount) +''', 10 ; '''
                 else :
                     query = '''select cm.*,u.nickname,u.userEmail,u.profileImgUrl 
                     from community cm join user u
                     on cm.userId = u.id
                     where cm.title like "%'''+str(keyword)+'''%" or cm.content like "%'''+str(keyword)+'''%"
+                    order by cm.createdAt desc 
                     limit ''' + str(pageCount) +''', 10 ; '''
 
             else :
@@ -91,6 +93,7 @@ class community(Resource) :
                             from community cm join user u
                             on cm.userId = u.id
                             where cm.userId = '''+str(userId)+'''
+                            order by cm.createdAt desc 
                             limit ''' + str(pageCount) +''', 10 ; '''
                 else :
                     query='''select cm.*,u.nickname,u.userEmail,u.profileImgUrl 
@@ -98,6 +101,7 @@ class community(Resource) :
                             on cm.userId = u.id
                             where cm.userId = '''+str(userId)+''' and 
                             (cm.title like "%'''+str(keyword)+'''%" or cm.content like "%'''+str(keyword)+'''%")
+                            order by cm.createdAt desc 
                             limit ''' + str(pageCount) +''', 10 ; '''
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query)
