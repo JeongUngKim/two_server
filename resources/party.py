@@ -89,7 +89,7 @@ class partyBoard(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select pb.*,u.userEmail,u.profileImgUrl
+            query = '''select pb.*,u.userEmail,u.profileImgUrl,u.nickname
             from partyBoard pb join user u 
             on pb.userId = u.id 
             limit '''+str(pageCount)+''',10 ; '''
@@ -248,10 +248,11 @@ class party(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select p.captain,p.partyBoardId,p.createdAt,pb.service,pb.title,pb.serviceId,pb.servicePassword,pb.finishedAt
+            query = '''select p.captain,p.partyBoardId,p.createdAt,pb.service,pb.title,pb.serviceId,pb.servicePassword,pb.finishedAt,u.userEmail,u.profileImgUrl,u.nickname
                         from party p 
                         join partyBoard pb 
-                        on p.partyBoardId = pb.partyBoardId
+                        on p.partyBoardId = pb.partyBoardId join user u 
+                        on pb.userId = u.id 
                         where member = %s 
                         limit '''+str(pageCount) + ''',10 ;'''
             record = (userId,)
