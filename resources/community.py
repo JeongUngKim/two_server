@@ -23,7 +23,8 @@ class community(Resource) :
         try :
             if 'photo' in request.files :
                 file = request.files['photo']
-                file_name=title+'_'+str(userId)+'.jpg'
+                current_time = datetime.now()
+                file_name=current_time.isoformat().replace(':','_')+'_'+str(userId)+'.jpg'
             
                 try :
                     client = boto3.client(
@@ -130,7 +131,9 @@ class communityUD(Resource) :
         try :
             if 'photo' in request.files :
                 file = request.files['photo']
-                file_name=title+'_'+str(userId)+'.jpg'
+                current_time = datetime.now()
+                file_name=current_time.isoformat().replace(':','_')+'_'+str(userId)+'.jpg'
+                
                 try :
                     client = boto3.client(
                         's3', 
