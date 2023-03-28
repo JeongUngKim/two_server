@@ -69,19 +69,46 @@ class partyBoard(Resource) :
             cursor = connection.cursor()
 
             cursor.execute(query,record)
-
-            id = cursor.lastrowid
             connection.commit()
+            lastrowId = cursor.lastrowid
 
+            
             cursor.close()
             connection.close()
+
+            connection = get_connection()
+            
+            query = '''select pb.*,u.userEmail,u.profileImgUrl,u.nickname
+            from partyBoard pb join user u 
+            on pb.userId = u.id 
+            where pb.partyBoardId = '''+str(lastrowId)+'''; '''            
+            
+            
+            cursor = connection.cursor(dictionary=True)
+           
+            cursor.execute(query)
+            
+            partyObject = cursor.fetchall()
+            
+            cursor.close()
+            connection.close()
+
+            i = 0
+            for row in partyObject :
+                partyObject[i]['createdAt'] = row['createdAt'].isoformat()
+                partyObject[i]['finishedAt'] = row['finishedAt'].isoformat()
+                
+                i+=1
+
         except Error as e :
             print(str(e))
+            
             cursor.close()
             connection.close()
+            
             return {'error':str(e)},500
         
-        return {'result':'success','partyBoardId' : id},200
+        return {'result':'success','party':partyObject[0]},200
 
     def get(self) : 
         page = request.args.get('page')
@@ -91,7 +118,8 @@ class partyBoard(Resource) :
 
             query = '''select pb.*,u.userEmail,u.profileImgUrl,u.nickname
             from partyBoard pb join user u 
-            on pb.userId = u.id 
+            on pb.userId = u.id
+            order by pb.createdAt desc 
             limit '''+str(pageCount)+''',10 ; '''
 
             cursor = connection.cursor(dictionary=True)
@@ -144,17 +172,41 @@ class partyBoardUD(Resource) :
             cursor.execute(query,record)
 
             connection.commit()
-
+            
             cursor.close()
 
             connection.close()
+
+            connection = get_connection()
+            
+            query = '''select pb.*,u.userEmail,u.profileImgUrl,u.nickname
+            from partyBoard pb join user u 
+            on pb.userId = u.id 
+            where pb.partyBoardId = '''+str(partyBoardId)+'''; '''            
+            
+            
+            cursor = connection.cursor(dictionary=True)
+           
+            cursor.execute(query)
+            
+            partyObject = cursor.fetchall()
+            
+            cursor.close()
+            connection.close()
+
+            i = 0
+            for row in partyObject :
+                partyObject[i]['createdAt'] = row['createdAt'].isoformat()
+                partyObject[i]['finishedAt'] = row['finishedAt'].isoformat()
+                
+                i+=1
         except Error as e :
             print(str(e))
             cursor.close()
             connection.close()
             return {'error':str(e)},500
         
-        return {'result':'success'},200
+        return {'result':'success','party':partyObject[0]},200
 
 
     @jwt_required()
