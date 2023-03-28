@@ -312,7 +312,7 @@ class party(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select p.captain,p.partyBoardId,p.createdAt,pb.service,pb.title,pb.serviceId,pb.servicePassword,pb.finishedAt,u.userEmail,u.profileImgUrl,u.nickname
+            query = '''select p.captain as userId,p.partyBoardId,p.createdAt,pb.service,pb.title,pb.serviceId,pb.servicePassword,pb.finishedAt,u.userEmail,u.profileImgUrl,u.nickname
                         from party p 
                         join partyBoard pb 
                         on p.partyBoardId = pb.partyBoardId join user u 
