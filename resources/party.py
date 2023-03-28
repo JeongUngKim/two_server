@@ -381,12 +381,12 @@ class partycheck(Resource) :
         try :
             connection = get_connection()
 
-            query = '''select pb.userId,pb.service,pb.serviceId,pb.servicePassword,pb.finishedAt,u.userEmail
-                        from party p join partyBoard pb
-                        on p.partyBoardId = pb.partyBoardId join user u
-                        on p.member = u.id
-                        where p.partyBoardId = %s 
-                        ;
+            query = '''select pb.partyBoardId, pb.userId,pb.service,pb.serviceId,pb.servicePassword,pb.finishedAt,u.userEmail
+                    from partyBoard pb left join party p 
+                    on pb.partyBoardId = p.partyBoardId left join user u
+                    on p.member = u.id
+                    where pb.partyBoardId = %s
+; 
                         '''
             record = (partyBoardId,)
 
@@ -399,7 +399,8 @@ class partycheck(Resource) :
             i=0
             for member in partyMemberList :
                 partyMemberList[i]['finishedAt'] = member['finishedAt'].isoformat()
-                memberlist.append(partyMemberList[i]['userEmail'])
+                if partyMemberList[i]['userEmail'] is not None :
+                    memberlist.append(partyMemberList[i]['userEmail'])
                 i+=1
 
             cursor.close()
