@@ -366,7 +366,7 @@ class contentReviewMe(Resource) :
             return {'error',str(e)},500
 
         return {"result":"success",
-                "ReviewList":ReviewList,
+                "contentReviewList":ReviewList,
                 "ReviewListSize":len(ReviewList)},200   
 
 

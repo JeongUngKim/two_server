@@ -100,6 +100,18 @@ class partyBoard(Resource) :
                 
                 i+=1
 
+            connection =get_connection()
+            query = '''insert into party(captain, partyBoardId )
+                    values(%s,%s);'''
+            record = (userId,lastrowId)
+            cursor = connection.cursor()
+
+            cursor.execute(query,record)
+            connection.commit()
+            cursor.close()
+            connection.close()
+
+
         except Error as e :
             print(str(e))
             
