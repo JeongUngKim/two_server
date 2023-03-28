@@ -344,7 +344,7 @@ class party(Resource) :
             connection.close()
             return {'error',str(e)},500
         
-        return {'result': 'success','partyList' : party_list,
+        return {'result': 'success','partylist' : party_list,
                 'pageNum':page,
                 'partySize':str(len(party_list))},200
         
@@ -418,3 +418,46 @@ class partycheck(Resource) :
                 "memberEmail":memberlist,"service":partyMemberList[0]['service'],
                  "serviceId":partyMemberList[0]['serviceId'],"servicePassword":partyMemberList[0]['servicePassword'] ,
                  "finishedAt":partyMemberList[0]['finishedAt']},200
+
+class partyCaptain(Resource):
+    @jwt_required()
+    def get(self) :
+        userId = get_jwt_identity()
+        page = request.args.get('page')
+        pageCount = int(page) * 10
+        try : 
+            connection = get_connection()
+
+            query = '''select pb.partyBoardId,pb.service,pb.title,pb.createdAt,pb.userId,pb.serviceId,pb.servicePassword,pb.finishedAt,u.userEmail,u.profileImgUrl,u.nickname,count(pd.userId) as memberCnt 
+                    from paymentDetails pd
+                    join partyBoard pb
+                    on pd.partyBoardId = pb.partyBoardId join user u
+                    on pb.userId = u.id
+                    where pb.userId = %s
+                    group by pb.partyBoardId
+                    limit '''+str(pageCount) + ''',10 ;'''
+            record = (userId,)
+
+            cursor = connection.cursor(dictionary=True)
+
+            cursor.execute(query,record)
+
+            captainparty = cursor.fetchall();
+
+            cursor.close()
+
+            connection.close()
+
+            i = 0 
+            for row in captainparty :
+                captainparty[i]['createdAt'] = row['createdAt'].isoformat()
+                captainparty[i]['finishedAt'] = row['finishedAt'].isoformat()
+                i+=1
+            
+        except Error as e :
+            print(str(e))
+            cursor.close()
+            connection.close()
+            return {'error',str(e)},500
+        
+        return {'result':'success','partylist':captainparty},200
