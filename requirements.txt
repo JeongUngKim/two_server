@@ -8,3 +8,4 @@ passlib
 flask-jwt-extended
 email-validator
 boto3
+scikit-surprise==1.1.3
