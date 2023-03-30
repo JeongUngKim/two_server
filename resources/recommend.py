@@ -190,5 +190,3 @@ class RecommendResource2(Resource):
 # print(new_data)
 
 # recommend = joblib.load('recommend_content.pkl')
-
-# recommend.recommend_movie_list(new_data,title="블랙 팬서: 와칸다 포에버")
