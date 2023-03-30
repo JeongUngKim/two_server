@@ -178,12 +178,7 @@ class RecommendResource2(Resource):
                     data.append(movie[0])
                 
                 data = tuple(data)
-            # for i, movie in enumerate(top_movies):
-            #     print(f"{i+1}. 영화 ID: {movie[0]}, 예측 평점: {movie[1]}")
-
-            # contentIdList = df["contentId"].values
-            # # contentIdList=list(set(contentIdList))
-
+            
             
                 connection = get_connection()
     
