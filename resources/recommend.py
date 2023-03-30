@@ -171,7 +171,7 @@ class RecommendResource2(Resource):
                 recommended_movies = sorted(recommended_movies.items(), key=lambda x: x[1], reverse=True)
 
                 top_movies = recommended_movies[:10]
-                df = pd.DataFrame(columns=['contentId','contentRating'])
+                
                 # print(f"사용자 {user_id}에게 추천하는 영화 리스트:")
                 data=[]
                 for i, movie in enumerate(top_movies):
@@ -186,7 +186,7 @@ class RecommendResource2(Resource):
 
             
                 connection = get_connection()
-
+    
                 query = '''select * from content
                         where Id in'''+str(data)+''';'''
                 cursor = connection.cursor(dictionary=True)
