@@ -4,6 +4,8 @@ from flask_restful import Resource
 import numpy as np
 import pandas as pd
 import joblib
+
+#scikit-surprise 1.1.3 
 from surprise import KNNBaseline
 from surprise import SVD
 from surprise import Dataset, Reader
@@ -11,6 +13,7 @@ from surprise import KNNBaseline
 from surprise import accuracy
 from surprise.model_selection import train_test_split
 from surprise import NormalPredictor
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import pickle
@@ -97,7 +100,6 @@ class RecommendResource2(Resource):
     
     @jwt_required()
     def post(self):
-        
         with open('hybrid_model.pkl', 'rb') as f:
             algo_svd, algo_knn, alpha = pickle.load(f)
 
