@@ -97,6 +97,7 @@ class RecommendResource2(Resource):
     
     @jwt_required()
     def post(self):
+        
         with open('hybrid_model.pkl', 'rb') as f:
             algo_svd, algo_knn, alpha = pickle.load(f)
 
