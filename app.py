@@ -6,6 +6,8 @@ from resources.community import community, communityLike, communityUD
 
 from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewMe, contentReviewUD, contentWatchme, search
 from resources.party import party, partyBoard, partyBoardUD, partyCaptain, partyD, partySearch, partycheck
+from resources.recommend import RecommendResource1
+from resources.recommend import RecommendResource2
 from resources.user import UserContentLike, UserGenre, UserIsEmail, UserIsId, UserIsNickname, UserIspassword, UserLoginResource, UserLogoutResource, UserPasswordChanged, UserProfileChange, UserRegisterResource
 from resources.user import jwt_blacklist
 
@@ -82,5 +84,10 @@ api.add_resource(UserProfileChange,'/user')
 api.add_resource(community,'/community')
 api.add_resource(communityUD,'/community/<int:communityId>')
 api.add_resource(communityLike,'/communityLike/<int:communityId>')
+
+#추천 관련 api
+api.add_resource(RecommendResource1,'/recommendfirst')
+api.add_resource(RecommendResource2,'/recommendsecond')
+
 if __name__ == '__main__' : 
     app.run()
