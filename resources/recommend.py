@@ -1,15 +1,6 @@
-from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import Resource
-import numpy as np
 import pandas as pd
-from surprise import KNNBaseline
-from surprise import SVD
-from surprise import Dataset, Reader
-from surprise import KNNBaseline
-from surprise import accuracy
-from surprise.model_selection import train_test_split
-from surprise import NormalPredictor
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import pickle
@@ -110,7 +101,7 @@ class RecommendResource1(Resource):
             connection.close()
             return {'error':str(e)},500
         
-        return {'result': 'success','recommendLis':recommendList},200
+        return {'result': 'success','recommendList':recommendList},200
 
 class RecommendResource2(Resource):
     
@@ -145,9 +136,93 @@ class RecommendResource2(Resource):
             con.close()
 
             new_data = pd.DataFrame(data)
-            if (new_data is None):
+            if (len(rated_movies)==0):
                 
-                RecommendResource1.get(self)
+                user_id = get_jwt_identity()
+                print(user_id)
+                con = get_connection()
+                cursor = con.cursor(dictionary=True)
+                query = '''select * from content;'''
+                cursor.execute(query)
+                data = cursor.fetchall()
+                cursor.close()
+                con.close()
+                movies = pd.DataFrame(data)
+                # # print(movies.head())
+                movies = movies.dropna()
+                movies = movies.reset_index()
+                movies = movies.drop(columns='index')
+                movies.head(2)
+            # # 장르 데이터 전처리
+            # movies['genre'] = movies['genre'].str.replace('|', ' ')
+
+            # TF-IDF 벡터화
+                tfidf = TfidfVectorizer(stop_words='english')
+                tfidf_matrix = tfidf.fit_transform(movies['genre'])
+
+                # 코사인 유사도 계산
+                cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+                # 추천 함수
+                # titles=['블랙 팬서: 와칸다 포에버','더 웨일','아바타: 물의 길']
+                con = get_connection()
+                cursor = con.cursor(dictionary=True)
+                query = '''SELECT g.userId,t.tagName FROM tag t
+                            left join userGenre g
+                            on t.tagId=g.tagId
+                            where g.userId ='''+str(user_id)+''';'''
+                cursor.execute(query)
+                data = cursor.fetchall()
+                cursor.close()
+                con.close()
+                # print(data[0]['tagName'])
+                titles=[]
+                for i in range(0,3):
+                    titles.append(data[i]['tagName'])
+                
+                # # titles=request.form.getlist("titles")
+                print(titles)
+            # recommender = joblib.load('movie_recommender.pkl')
+            
+                indices = pd.Series(movies.index, index=movies['title'])
+                idx_list = []
+                for title in titles:
+                    idx = indices[title]
+                    sim_scores = list(enumerate(cosine_sim[idx]))
+                    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+                    sim_scores = sim_scores[1:11]
+                    movie_indices = [i[0] for i in sim_scores]
+                    idx_list.extend(movie_indices)
+                idx_list = list(set(idx_list))
+                df_rec = movies.iloc[idx_list][['Id', 'title', 'genre']].reset_index(drop=True)
+                df_rec = df_rec[~df_rec['title'].isin(titles)].head(10)
+            
+
+                # contentIdList=recommender.recommend_movies(titles)
+                contentIdList=df_rec["Id"].values
+                contentIdList=tuple(contentIdList)
+                print(contentIdList)
+            
+                connection = get_connection()
+
+                query = '''select * from content
+                        where Id in'''+str(contentIdList)+''';'''
+                cursor = connection.cursor(dictionary=True)
+
+                cursor.execute(query)
+
+                recommendList = cursor.fetchall()
+                i = 0
+                for row in recommendList :
+                    recommendList[i]['createdYear'] = row['createdYear'].isoformat()
+                    
+                    i=i+1
+
+                cursor.close()
+                connection.close()
+
+            
+                return {'result': 'success','recommendList':recommendList},200
                     
             else:
 
@@ -178,12 +253,7 @@ class RecommendResource2(Resource):
                     data.append(movie[0])
                 
                 data = tuple(data)
-            # for i, movie in enumerate(top_movies):
-            #     print(f"{i+1}. 영화 ID: {movie[0]}, 예측 평점: {movie[1]}")
-
-            # contentIdList = df["contentId"].values
-            # # contentIdList=list(set(contentIdList))
-
+            
             
                 connection = get_connection()
     
@@ -208,7 +278,7 @@ class RecommendResource2(Resource):
             cursor.close()
             con.close()
             return {'error':str(e)},500    
-        return {'result': 'success','recommendLis':recommendList},200
+        return {'result': 'success','recommendList':recommendList},200
         # data1 = jsonify(data)
         # return {'result':'success',
         #         'items':data1},200
