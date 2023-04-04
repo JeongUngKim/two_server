@@ -102,7 +102,9 @@ class search(Resource) :
 
         data = request.get_json()
         type = request.args.get('type')
-
+        if  type not in ['all','tv','movie'] :
+            return {'error':"type 을 확인하세요."},400
+        
         if data["filtering"] == "":
             data["filtering"] = "title"
         if data["filtering"] not in ["title","contentRating","createdYear","Id"] :
@@ -151,7 +153,8 @@ class content(Resource) :
             cursor=connection.cursor(dictionary=True)
             cursor.execute(query,record)
             content = cursor.fetchall()
-
+            if content == [] :
+                return {'error':'컨텐츠가 없습니다.'},400
             cursor.close()
             connection.close()
         except Error as e:
@@ -276,6 +279,9 @@ class contentReview(Resource) :
 
         data = request.get_json()
 
+        if data is None :
+            return {'error':'서버 전송 데이터를 확인해주세요.'},400
+
         try:
             connection = get_connection()
 
@@ -378,6 +384,9 @@ class contentReviewUD(Resource) :
         
         data = request.get_json()
         
+        if data is None :
+            return {'error':'서버 전송 데이터를 확인하세요.'},400
+
         try : 
             connection = get_connection()
 
@@ -616,6 +625,9 @@ class ReviewCommentUD(Resource):
         userId = get_jwt_identity()
 
         data = request.get_json()
+
+        if data is None :
+            return {'error':'서버 전송 데이터를 확인하세요.'},400
 
         try :
             connection = get_connection()

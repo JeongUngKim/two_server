@@ -32,7 +32,7 @@ class UserRegisterResource(Resource) :
 
         
         if 'profileImg' not in request.files :
-            return {'error' : '사진이 없습니다.'}
+            return {'error' : '사진이 없습니다.'},400
 
         file = request.files['profileImg']
         
@@ -233,6 +233,12 @@ class UserIsId(Resource) :
 class UserIsEmail(Resource) :
     def post(self) :
         data = request.get_json()
+
+        try : 
+            validate_email( data["userEmail"] )
+        except EmailNotValidError as e :
+            
+            return {'error' : '이메일 형식을 확인하세요'} , 400
 
         try :
             connection = get_connection()

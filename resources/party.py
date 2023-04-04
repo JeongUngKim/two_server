@@ -9,6 +9,12 @@ class partySearch(Resource):
     def post(self) :
         data = request.get_json()
         
+        page = request.args.get('page')
+        pageCount = int(page) * 10
+        
+        if data is None :
+            return {'error':'서버 전송 데이터를 확인하세요.'},400
+        
         try :
             connection = get_connection()
 
@@ -16,7 +22,8 @@ class partySearch(Resource):
                     from partyBoard pb left join party p 
                     on pb.partyBoardId = p.partyBoardId 
                     where pb.title like "%'''+data['keyword']+'''%" or pb.service like "%'''+data['service']+'''%"
-                    group by partyBoardId;'''
+                    group by partyBoardId
+                    limit '''+str(pageCount)+''',10 ; '''
             cursor = connection.cursor(dictionary=True)
 
             cursor.execute(query)
@@ -56,7 +63,8 @@ class partyBoard(Resource) :
 
         data = request.get_json()
 
-
+        if data is None :
+            return {'error':'서버 전송 데이터를 확인하세요.'},400
 
         try :
             connection = get_connection()
@@ -169,8 +177,10 @@ class partyBoardUD(Resource) :
 # }
         userId = get_jwt_identity()
         data = request.get_json()
+        if data is None :
+            return {'error':'서버 전송 데이터를 확인하세요.'},400
         password = hash_password(data['servicePassword'])
-        
+
         try : 
             connection = get_connection()
 
@@ -257,6 +267,8 @@ class party(Resource) :
 
         userId = get_jwt_identity()
         data = request.get_json()
+        if data is None :
+            return {'error':'서버 전송 데이터를 확인하세요.'},400
         try : 
             connection = get_connection()
 
