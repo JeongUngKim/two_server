@@ -85,6 +85,8 @@ class community(Resource) :
         pageCount = int(page) * 10
 
         keyword = request.args.get('keyword')
+        if  request.args.get('keyword') is None :
+            return {'error':'키워드 를 설정해주세요.'},400
 
         try :
             connection = get_connection()
@@ -304,4 +306,5 @@ class communityLike(Resource) :
             return {'error':str(e)},400
     
         return {'result':'success'},200
+
 
