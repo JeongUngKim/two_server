@@ -11,7 +11,7 @@ from flask_jwt_extended import JWTManager
 from resources.community import community, communityLike, communityUD
 
 from surprise import SVD
-from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, actor, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewMe, contentReviewUD, contentWatchme, search
+from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewMe, contentReviewUD, contentWatchme, search
 from resources.party import party, partyBoard, partyBoardUD, partyCaptain, partyD, partySearch, partycheck
 from resources.recommend import RecommendResource1
 from resources.recommend import RecommendResource2
@@ -41,7 +41,6 @@ api.add_resource(search,'/search')
 
 # 컨텐츠 api
 api.add_resource(content,'/content/<int:contentId>')
-api.add_resource(actor,'/content/<int:tmdbcontentId>/actor')
 
 # 컨텐츠 찜관련 api
 api.add_resource(contentLike,'/contentlike/<int:contentId>')
