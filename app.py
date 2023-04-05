@@ -1,13 +1,24 @@
+import serverless_wsgi
+
+import os 
+os.environ["JOBLIB_MULTIPROCESSING"] = "0"
+os.environ["HOME"]  = "/tmp"
+
 from flask import Flask
 from flask_restful import Api
 from config import Config
 from flask_jwt_extended import JWTManager
 from resources.community import community, communityLike, communityUD
 
-from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewMe, contentReviewUD, contentWatchme, search
+from surprise import SVD
+from resources.content import ContentWatch, ReviewComment, ReviewCommentUD, actor, content, contentLike, contentRank, contentReview, contentReviewLike, contentReviewMe, contentReviewUD, contentWatchme, search
 from resources.party import party, partyBoard, partyBoardUD, partyCaptain, partyD, partySearch, partycheck
+from resources.recommend import RecommendResource1
+from resources.recommend import RecommendResource2
 from resources.user import UserContentLike, UserGenre, UserIsEmail, UserIsId, UserIsNickname, UserIspassword, UserLoginResource, UserLogoutResource, UserPasswordChanged, UserProfileChange, UserRegisterResource
 from resources.user import jwt_blacklist
+
+
 
 app = Flask(__name__)
 
@@ -30,6 +41,7 @@ api.add_resource(search,'/search')
 
 # 컨텐츠 api
 api.add_resource(content,'/content/<int:contentId>')
+api.add_resource(actor,'/content/<int:tmdbcontentId>/actor')
 
 # 컨텐츠 찜관련 api
 api.add_resource(contentLike,'/contentlike/<int:contentId>')
@@ -83,5 +95,13 @@ api.add_resource(community,'/community')
 api.add_resource(communityUD,'/community/<int:communityId>')
 api.add_resource(communityLike,'/communityLike/<int:communityId>')
 
-if __name__ == '__main__' : 
-    app.run()
+#추천 관련 api
+api.add_resource(RecommendResource1,'/recommendfirst')
+api.add_resource(RecommendResource2,'/recommendsecond')
+
+def handler(event, context):
+    return serverless_wsgi.handle_request(app, event,  context)
+
+if __name__ == '__main__' :
+    app.run() 
+    # app.run(host="0.0.0.0", port=5000, debug=True)
