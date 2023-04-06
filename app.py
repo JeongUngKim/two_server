@@ -18,7 +18,7 @@ from resources.recommend import RecommendResource2
 from resources.user import UserContentLike, UserGenre, UserIsEmail, UserIsId, UserIsNickname, UserIspassword, UserLoginResource, UserLogoutResource, UserPasswordChanged, UserProfileChange, UserRegisterResource
 from resources.user import jwt_blacklist
 
-
+#1
 
 app = Flask(__name__)
 
